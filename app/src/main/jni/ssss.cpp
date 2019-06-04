@@ -1,5 +1,5 @@
 #include <jni.h>
-#include<cstdio.h>
+#include<stdio.h>
 #include <GLES2/gl2.h>
 #include <cmath>
 #include<stdlib.h>
@@ -179,15 +179,15 @@ void on_surface_created() {
         if(i < height/3) {
 
             for (tmp = (width * 2 - i * 4); tmp < (width * 2 + i * 4); tmp += 4) {
-                buffers1[i * width * 4 + tmp + 1] = 0x0;
-                buffers1[i * width * 4 + tmp + 2] = 0xff;
+                buffers1[i * width * 4 + tmp + 0] = 0x0;
+                buffers1[i * width * 4 + tmp + 2] = 0x0;
             }
         }
         else
         {
             for (tmp = (width * 2 - (height/5) * 4); tmp < (width * 2 + (height/5) * 4); tmp += 4) {
-                buffers1[i * width * 4 + tmp + 1] = 0x0;
-                buffers1[i * width * 4 + tmp + 2] = 0xff;
+                buffers1[i * width * 4 + tmp + 0] = 0x0;
+                buffers1[i * width * 4 + tmp + 2] = 0x0;
             }
 
         }
@@ -200,6 +200,7 @@ void on_surface_created() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,buffers);
+    //使用此函数之后，buffers即可释放，即便修改buffer内容也不会影响显示内容.
 
     glBindTexture(GL_TEXTURE_2D,cubeTex[1]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,    GL_CLAMP_TO_EDGE);
@@ -232,6 +233,10 @@ GLfloat vVertices[] = { -1.0f,  1.0f, 0.0f,  // Position 0
 //点的索引，因为是画三角形，所以需要分两次画成矩形，所以，0，1，2为vVertices里面的对应索引，，，分两次画三角形成为矩形
 GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
 GLushort indices1[] = { 4, 5, 6, 4, 6, 7 };
+GLushort indices2[] = { 4, 5, 6, 4, 6, 7 };
+GLushort indices3[] = { 4, 5, 6, 4, 6, 7 };
+GLushort indices4[] = { 4, 5, 6, 4, 6, 7 };
+GLushort indices5[] = { 4, 5, 6, 4, 6, 7 };
 //GLushort indices1[] = { 0, 1, 2, 0, 2, 3 };
 
 void on_draw_frame() {
@@ -239,6 +244,78 @@ void on_draw_frame() {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear (GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glUseProgram(program);
+
+    static int cnt = 1;
+    if(cnt % 50 == 0)
+    {
+        {
+            int i;
+            int j;
+            int tmp;
+
+            for (i = 0; i < height; i++) {
+                if (i < height / 3) {
+
+                    for (tmp = (width * 2 - i * 4); tmp < (width * 2 + i * 4); tmp += 4) {
+                        for (j = 0; j < 3; j++) {
+                            // if (cnt % 3
+                            buffers[i * width * 4 + tmp + 0] = 0xff;
+                            buffers[i * width * 4 + tmp + 1] = 0xff;
+                            buffers[i * width * 4 + tmp + 2] = 0xff;
+                            buffers[i * width * 4 + tmp + cnt % 3] = 0x0;
+                        }
+
+                        buffers[i * width * 4 + tmp + 3] = 0xff;
+                    }
+                } else {
+                    for (tmp = (width * 2 - (height / 5) * 4);
+                         tmp < (width * 2 + (height / 5) * 4); tmp += 4) {
+                        for (j = 0; j < 3; j++) {
+                            buffers[i * width * 4 + tmp + 0] = 0xff;
+                            buffers[i * width * 4 + tmp + 1] = 0xff;
+                            buffers[i * width * 4 + tmp + 2] = 0xff;
+                            buffers[i * width * 4 + tmp + cnt % 3] = 0x0;
+                        }
+
+                        buffers[i * width * 4 + tmp + 3] = 0xff;
+                    }
+
+                }
+
+            }
+            for (i = 0; i < height; i++) {
+                if (i < height / 3) {
+
+                    for (tmp = (width * 2 - i * 4); tmp < (width * 2 + i * 4); tmp += 4) {
+                        for (j = 0; j < 3; j++) {
+                            buffers1[i * width * 4 + tmp + 0] = 0x0;
+                            buffers1[i * width * 4 + tmp + 1] = 0x0;
+                            buffers1[i * width * 4 + tmp + 2] = 0xff;
+                           // buffers1[i * width * 4 + tmp + ((cnt + 1) % 3)] = 0x0;
+                           // buffers1[i * width * 4 + tmp + ((cnt + 1) % 3)+1] = 0x0;
+                        }
+                        buffers1[i * width * 4 + tmp + 3] = 0xff;
+                    }
+                } else {
+                    for (tmp = (width * 2 - (height / 5) * 4);
+                         tmp < (width * 2 + (height / 5) * 4); tmp += 4) {
+                        for (j = 0; j < 3; j++) {
+                            buffers1[i * width * 4 + tmp + 0] = 0x0;
+                            buffers1[i * width * 4 + tmp + 1] = 0xff;
+                            buffers1[i * width * 4 + tmp + 2] = 0x0;
+                            buffers1[i * width * 4 + tmp + ((cnt + 1) % 3)] = 0x0;
+                            buffers1[i * width * 4 + tmp + ((cnt + 1) % 3)+1] = 0x0;
+                        }
+
+                        buffers1[i * width * 4 + tmp + 3] = 0xff;
+                    }
+
+                }
+
+            }
+        }
+    }
+    cnt+=1;
 
   //  glViewport(0, 0, width, height); //Maybe should not keep this in on_draw_frame
     glClear ( GL_COLOR_BUFFER_BIT );
@@ -250,7 +327,7 @@ void on_draw_frame() {
     vPosition = glGetAttribLocation(program, "a_position");
     mTextureCoordinateHandle = glGetAttribLocation(program, "a_texCoord");
     mTextureUniformHandle = glGetUniformLocation(program, "u_Texture");
-    mTextureUniformHandle1 = glGetUniformLocation(program, "u_Texture1");
+   // mTextureUniformHandle1 = glGetUniformLocation(program, "u_Texture1");
 // Load the vertex position
     glVertexAttribPointer(vPosition, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), vVertices );
     // Load the texture coordinate
@@ -259,20 +336,27 @@ void on_draw_frame() {
     glEnableVertexAttribArray (vPosition);
     glEnableVertexAttribArray (mTextureCoordinateHandle);
 
+
     glActiveTexture ( GL_TEXTURE0 );
     glBindTexture(GL_TEXTURE_2D, cubeTex[0]);
-    glUniform1i (vPosition, 0 );
-    glUniform1i(mTextureCoordinateHandle, 0);
-    glUniform1i(mTextureUniformHandle, 0);
-    glUniform1i(mTextureUniformHandle1, 0);
+    //glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,buffers);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffers);
+    //NO need this?
+    //glUniform1i (vPosition, 0 );
+    //glUniform1i(mTextureCoordinateHandle, 0);
+    //glUniform1i(mTextureUniformHandle, 0);
+   // glUniform1i(mTextureUniformHandle1, 0);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
 
-    //glActiveTexture ( GL_TEXTURE0 ); //TODO GL_TEXTURE0??
+    glActiveTexture ( GL_TEXTURE0 ); //TODO GL_TEXTURE0??
     glBindTexture(GL_TEXTURE_2D, cubeTex[1]);
-    glUniform1i (vPosition, 0 );
-    glUniform1i(mTextureCoordinateHandle, 0);
-    glUniform1i(mTextureUniformHandle, 0);
-    glUniform1i(mTextureUniformHandle1, 0);
+    //glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,buffers1);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffers1);
+    //NO need this?
+    //glUniform1i (vPosition, 0 );
+   // glUniform1i(mTextureCoordinateHandle, 0);
+    //glUniform1i(mTextureUniformHandle, 0);
+   // glUniform1i(mTextureUniformHandle1, 0);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices1);
 
 
