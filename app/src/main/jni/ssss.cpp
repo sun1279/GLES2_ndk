@@ -58,9 +58,12 @@ GLuint loadShader(GLenum shaderType, const char* shaderSource)
 }
 
 const GLchar v_shader[1024] =
-        "attribute vec4 a_position;    \n"
+        /*attribute 变量只用于顶点着色器中，用来存储顶点着色器中每个顶点的输入（per-vertex inputs）。attribute
+         * 通常用来存储位置坐标、法向量、纹理坐标和颜色等。注意 attribute 是用来存储单个顶点的信息。*/
+        "attribute vec4 a_position;    \n" /*由应用程序传输给顶点着色器的逐顶点的数据*/
         "attribute vec2 a_texCoord;   \n"
-        "varying vec2 v_TexCoordinate;     \n"
+        "varying vec2 v_TexCoordinate;     \n" /*由顶点着色器传输给片段着色器中的插值数据,顶点着色器和片段着色器中都会有 varying 变量的声明，
+ * 由于 varying 是顶点着色器的输出且是片段着色器的输入，所以两处声明必须一致*/
         "void main()                  \n"
         "{                            \n"
         "   gl_Position = a_position;  \n"
@@ -68,20 +71,23 @@ const GLchar v_shader[1024] =
         "}                            \n";
 const GLchar p_shader1[1024] =
         "precision mediump float;					  \n"
-        "uniform sampler2D u_Texture;                 \n"
+        "uniform sampler2D u_Texture;                 \n" /*在图元处理过程中其值保持不变，由应用程序传输给着色器*/
         "uniform sampler2D u_Texture1;                 \n"
         "varying vec2 v_TexCoordinate;                \n"
         "void main()                                  \n"
         "{                                            \n"
         "    gl_FragColor = texture2D(u_Texture, v_TexCoordinate); \n"
         "}                                            \n";
+/*gl_Position，内建变量，顶点着色器的输出值，而且是必须要赋值的变量。对 gl_Position 设置的值会成为该顶点着色器的输出。
+gl_FragColor，和 gl_Position 一样，也是内建变量，对应片段的色值。*/
 
-const GLchar p_shader2[1024] =
-        "precision mediump float;					  \n"
-        "void main()                                  \n"
-        "{                                            \n"
-        "  gl_FragColor = vec4 ( 1.0, 0.0, 1.0, 1.0 );\n"
-        "}                                            \n";
+const GLchar v_shader1[1024] =
+        "attribute vec4 position; \n"
+        "uniform mat4 modelViewProjMatrix; \n"
+        "void main() { \n"
+        "gl_Position = modelViewProjMatrix * position; \n"
+        "}  \n";
+
 
 const GLchar p_shader[1024] =
         "precision mediump float;					  \n"
@@ -166,7 +172,7 @@ void on_surface_created() {
         }
         else
         {
-            for (tmp = (width * 2 - (height/5) * 4); tmp < (width * 2 + (height/5) * 4); tmp += 4) {
+            for (tmp = (width * 2 - (height/7) * 4); tmp < (width * 2 + (height/7) * 4); tmp += 4) {
                 buffers[i * width * 4 + tmp + 1] = 0x0;
                 buffers[i * width * 4 + tmp + 2] = 0x0;
             }
@@ -176,8 +182,8 @@ void on_surface_created() {
     }
     for( i = 0; i < height; i++)
     {
-        if(i < height/3) {
-
+        if(i < height/3)
+        {
             for (tmp = (width * 2 - i * 4); tmp < (width * 2 + i * 4); tmp += 4) {
                 buffers1[i * width * 4 + tmp + 0] = 0x0;
                 buffers1[i * width * 4 + tmp + 2] = 0x0;
@@ -185,13 +191,11 @@ void on_surface_created() {
         }
         else
         {
-            for (tmp = (width * 2 - (height/5) * 4); tmp < (width * 2 + (height/5) * 4); tmp += 4) {
+            for (tmp = (width * 2 - (height/7) * 4); tmp < (width * 2 + (height/7) * 4); tmp += 4) {
                 buffers1[i * width * 4 + tmp + 0] = 0x0;
                 buffers1[i * width * 4 + tmp + 2] = 0x0;
             }
-
         }
-
     }
     glGenTextures(2, cubeTex);
     glBindTexture(GL_TEXTURE_2D,cubeTex[0]);
@@ -213,30 +217,66 @@ void on_surface_created() {
 
 GLfloat vVertices[] = { -1.0f,  1.0f, 0.0f,  // Position 0
                         0.0f,  0.0f,        // TexCoord 0
-                        -1.0f, -0.0f, 0.0f,  // Position 1
+                        -1.0f, 1.0f/3, 0.0f,  // Position 1
                         0.0f,  1.0f,        // TexCoord 1
-                        0.0f, -0.0f, 0.0f,  // Position 2
+                        0.0f,  1.0f/3, 0.0f,  // Position 2
                         1.0f,  1.0f,        // TexCoord 2
                         0.0f,  1.0f, 0.0f,  // Position 3
                         1.0f,  0.0f,         // TexCoord 3
 
                         0.0f,  1.0f, 0.0f,  // Position 0
                         0.0f,  0.0f,        // TexCoord 0
-                        0.0f, -0.0f, 0.0f,  // Position 1
+                        0.0f,  1.0f/3, 0.0f,  // Position 1
                         0.0f,  1.0f,        // TexCoord 1
-                        1.0f, -0.0f, 0.0f,  // Position 2
+                        1.0f,  1.0f/3, 0.0f,  // Position 2
                         1.0f,  1.0f,        // TexCoord 2
                         1.0f,  1.0f, 0.0f,  // Position 3
+                        1.0f,  0.0f,         // TexCoord 3
+
+                       -1.0f, 1.0f/3, 0.0f,  // Position 0
+                        0.0f,  0.0f,        // TexCoord 0
+                        -1.0f,  -1.0f/3, 0.0f,  // Position 1
+                        0.0f,  1.0f,        // TexCoord 1
+                        0.0f,  -1.0f/3, 0.0f,  // Position 2
+                        1.0f,  1.0f,        // TexCoord 2
+                        0.0f,  1.0f/3, 0.0f,  // Position 3
+                        1.0f,  0.0f,         // TexCoord 3
+
+                        0.0f,  1.0f/3, 0.0f,  // Position 0
+                        0.0f,  0.0f,        // TexCoord 0
+                        0.0f,  -1.0f/3, 0.0f,  // Position 1
+                        0.0f,  1.0f,        // TexCoord 1
+                        1.0f,  -1.0f/3, 0.0f,  // Position 2
+                        1.0f,  1.0f,        // TexCoord 2
+                        1.0f,  1.0f/3, 0.0f,  // Position 3
+                        1.0f,  0.0f,         // TexCoord 3
+
+                        -1.0f, -1.0f/3, 0.0f,  // Position 0
+                        0.0f,  0.0f,        // TexCoord 0
+                        -1.0f,  -1.0f, 0.0f,  // Position 1
+                        0.0f,  1.0f,        // TexCoord 1
+                        0.0f,  -1.0, 0.0f,  // Position 2
+                        1.0f,  1.0f,        // TexCoord 2
+                        0.0f,  -1.0f/3, 0.0f,  // Position 3
+                        1.0f,  0.0f,         // TexCoord 3
+
+                        0.0f,  -1.0f/3, 0.0f,  // Position 0
+                        0.0f,  0.0f,        // TexCoord 0
+                        0.0f,  -1.0f, 0.0f,  // Position 1
+                        0.0f,  1.0f,        // TexCoord 1
+                        1.0f,  -1, 0.0f,  // Position 2
+                        1.0f,  1.0f,        // TexCoord 2
+                        1.0f,  -1.0f/3, 0.0f,  // Position 3
                         1.0f,  0.0f         // TexCoord 3
 };
 
 //点的索引，因为是画三角形，所以需要分两次画成矩形，所以，0，1，2为vVertices里面的对应索引，，，分两次画三角形成为矩形
 GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
 GLushort indices1[] = { 4, 5, 6, 4, 6, 7 };
-GLushort indices2[] = { 4, 5, 6, 4, 6, 7 };
-GLushort indices3[] = { 4, 5, 6, 4, 6, 7 };
-GLushort indices4[] = { 4, 5, 6, 4, 6, 7 };
-GLushort indices5[] = { 4, 5, 6, 4, 6, 7 };
+GLushort indices2[] = { 8, 9, 10, 8, 10, 11 };
+GLushort indices3[] = { 12, 13, 14, 12, 14, 15 };
+GLushort indices4[] = { 16, 17, 18, 16, 18, 19 };
+GLushort indices5[] = { 20, 21, 22, 20, 22, 23 };
 //GLushort indices1[] = { 0, 1, 2, 0, 2, 3 };
 
 void on_draw_frame() {
@@ -268,8 +308,8 @@ void on_draw_frame() {
                         buffers[i * width * 4 + tmp + 3] = 0xff;
                     }
                 } else {
-                    for (tmp = (width * 2 - (height / 5) * 4);
-                         tmp < (width * 2 + (height / 5) * 4); tmp += 4) {
+                    for (tmp = (width * 2 - (height / 7) * 4);
+                         tmp < (width * 2 + (height / 7) * 4); tmp += 4) {
                         for (j = 0; j < 3; j++) {
                             buffers[i * width * 4 + tmp + 0] = 0xff;
                             buffers[i * width * 4 + tmp + 1] = 0xff;
@@ -296,9 +336,10 @@ void on_draw_frame() {
                         }
                         buffers1[i * width * 4 + tmp + 3] = 0xff;
                     }
-                } else {
-                    for (tmp = (width * 2 - (height / 5) * 4);
-                         tmp < (width * 2 + (height / 5) * 4); tmp += 4) {
+                }
+                else{
+                    for (tmp = (width * 2 - (height / 7) * 4);
+                         tmp < (width * 2 + (height / 7) * 4); tmp += 4) {
                         for (j = 0; j < 3; j++) {
                             buffers1[i * width * 4 + tmp + 0] = 0x0;
                             buffers1[i * width * 4 + tmp + 1] = 0xff;
@@ -306,16 +347,13 @@ void on_draw_frame() {
                             buffers1[i * width * 4 + tmp + ((cnt + 1) % 3)] = 0x0;
                             buffers1[i * width * 4 + tmp + ((cnt + 1) % 3)+1] = 0x0;
                         }
-
                         buffers1[i * width * 4 + tmp + 3] = 0xff;
                     }
-
                 }
-
             }
         }
     }
-    cnt+=1;
+   // cnt+=1;
 
   //  glViewport(0, 0, width, height); //Maybe should not keep this in on_draw_frame
     glClear ( GL_COLOR_BUFFER_BIT );
@@ -357,9 +395,7 @@ void on_draw_frame() {
    // glUniform1i(mTextureCoordinateHandle, 0);
     //glUniform1i(mTextureUniformHandle, 0);
    // glUniform1i(mTextureUniformHandle1, 0);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices1);
-
-
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
 
 
 
