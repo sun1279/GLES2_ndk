@@ -23,8 +23,73 @@ float mVerticesData[] =  { 0.5f, 0.5f, 0.0f,
                           -0.5f, 0.5f, 0.0f,
                            0.0f, -0.5f, 0.0f};
 
-int _backingWidth = 200;
-int _backingHeight = 200;
+GLfloat vVertices[] = { -1.0f,  1.0f, 0.0f,  // Position 0
+                        0.0f,  0.0f,        // TexCoord 0
+                        -1.0f, 1.0f/3, 0.0f,  // Position 1
+                        0.0f,  1.0f,        // TexCoord 1
+                        0.0f,  1.0f/3, 0.0f,  // Position 2
+                        1.0f,  1.0f,        // TexCoord 2
+                        0.0f,  1.0f, 0.0f,  // Position 3
+                        1.0f,  0.0f,         // TexCoord 3
+
+                        0.0f,  1.0f, 0.0f,  // Position 0
+                        0.0f,  0.0f,        // TexCoord 0
+                        0.0f,  1.0f/3, 0.0f,  // Position 1
+                        0.0f,  1.0f,        // TexCoord 1
+                        1.0f,  1.0f/3, 0.0f,  // Position 2
+                        1.0f,  1.0f,        // TexCoord 2
+                        1.0f,  1.0f, 0.0f,  // Position 3
+                        1.0f,  0.0f,         // TexCoord 3
+
+                        -1.0f, 1.0f/3, 0.0f,  // Position 0
+                        0.0f,  0.0f,        // TexCoord 0
+                        -1.0f,  -1.0f/3, 0.0f,  // Position 1
+                        0.0f,  1.0f,        // TexCoord 1
+                        0.0f,  -1.0f/3, 0.0f,  // Position 2
+                        1.0f,  1.0f,        // TexCoord 2
+                        0.0f,  1.0f/3, 0.0f,  // Position 3
+                        1.0f,  0.0f,         // TexCoord 3
+
+                        0.0f,  1.0f/3, 0.0f,  // Position 0
+                        0.0f,  0.0f,        // TexCoord 0
+                        0.0f,  -1.0f/3, 0.0f,  // Position 1
+                        0.0f,  1.0f,        // TexCoord 1
+                        1.0f,  -1.0f/3, 0.0f,  // Position 2
+                        1.0f,  1.0f,        // TexCoord 2
+                        1.0f,  1.0f/3, 0.0f,  // Position 3
+                        1.0f,  0.0f,         // TexCoord 3
+
+                        -1.0f, -1.0f/3, 0.0f,  // Position 0
+                        0.0f,  0.0f,        // TexCoord 0
+                        -1.0f,  -1.0f, 0.0f,  // Position 1
+                        0.0f,  1.0f,        // TexCoord 1
+                        0.0f,  -1.0, 0.0f,  // Position 2
+                        1.0f,  1.0f,        // TexCoord 2
+                        0.0f,  -1.0f/3, 0.0f,  // Position 3
+                        1.0f,  0.0f,         // TexCoord 3
+
+                        0.0f,  -1.0f/3, 0.0f,  // Position 0
+                        0.0f,  0.0f,        // TexCoord 0
+                        0.0f,  -1.0f, 0.0f,  // Position 1
+                        0.0f,  1.0f,        // TexCoord 1
+                        1.0f,  -1, 0.0f,  // Position 2
+                        1.0f,  1.0f,        // TexCoord 2
+                        1.0f,  -1.0f/3, 0.0f,  // Position 3
+                        1.0f,  0.0f         // TexCoord 3
+};
+
+//点的索引，因为是画三角形，所以需要分两次画成矩形，所以，0，1，2为vVertices里面的对应索引，，，分两次画三角形成为矩形
+GLushort indices[][6] = { 0, 1, 2, 0, 2, 3,
+                          4, 5, 6, 4, 6, 7,
+                          8, 9, 10, 8, 10, 11,
+                          12, 13, 14, 12, 14, 15,
+                          16, 17, 18, 16, 18, 19,
+                          20, 21, 22, 20, 22, 23 };
+
+
+
+int _backingWidth = 420;
+int _backingHeight = 320;
 int width=_backingWidth;
 int height=_backingHeight;
 GLuint loadShader(GLenum shaderType, const char* shaderSource)
@@ -65,8 +130,8 @@ const GLchar v_shader[1024] =
  * 由于 varying 是顶点着色器的输出且是片段着色器的输入，所以两处声明必须一致*/
         "void main()                  \n"
         "{                            \n"
-        "   gl_Position = a_position;  \n"
-        "   v_TexCoordinate = a_texCoord;  \n"
+        "   gl_Position = a_position;  \n"// gl_Position是vertex shader的内建变量，gl_Position中的顶点值最终输出到渲染管线中
+        "   v_TexCoordinate = a_texCoord;  \n"//将a_texCoord的值通过v_TexCoordinate传递给fragment shader
         "}                            \n";
 const GLchar p_shader1[1024] =
         "precision mediump float;					  \n"
@@ -138,6 +203,123 @@ GLuint createProgram(const char* vertexSource, const char * fragmentSource)
     return program;
 }
 
+#define NUM_W 6
+#define NUM_H 8
+
+unsigned char num0[10][NUM_H][NUM_W]= {
+        0,0,1,1,0,0,
+        0,1,0,0,1,0,
+        0,1,0,0,1,0,
+        0,1,0,0,1,0,
+        0,1,0,0,1,0,
+        0,1,0,0,1,0,
+        0,0,1,1,0,0,
+        0,0,0,0,0,0,
+
+        0,0,0,1,0,0,
+        0,0,1,1,0,0,
+        0,0,0,1,0,0,
+        0,0,0,1,0,0,
+        0,0,0,1,0,0,
+        0,0,0,1,0,0,
+        0,0,1,1,1,0,
+        0,0,0,0,0,0,
+
+        0,0,1,1,0,0,
+        0,1,0,0,1,0,
+        0,0,0,0,1,0,
+        0,0,1,1,0,0,
+        0,1,0,0,0,0,
+        0,1,0,0,0,0,
+        0,1,1,1,1,0,
+        0,0,0,0,0,0,
+
+
+        0,0,1,1,0,0,
+        0,1,0,0,1,0,
+        0,0,0,0,1,0,
+        0,0,1,1,0,0,
+        0,0,0,0,1,0,
+        0,1,0,0,1,0,
+        0,0,1,1,0,0,
+        0,0,0,0,0,0,
+
+        0,0,0,0,0,0,
+        0,1,0,0,0,0,
+        0,1,0,1,0,0,
+        0,1,0,1,0,0,
+        0,1,1,1,1,0,
+        0,0,0,1,0,0,
+        0,0,0,1,0,0,
+        0,0,0,0,0,0,
+
+        0,0,1,1,1,0,
+        0,1,0,0,0,0,
+        0,1,0,0,0,0,
+        0,0,1,1,0,0,
+        0,0,0,0,1,0,
+        0,1,0,0,1,0,
+        0,0,1,1,0,0,
+        0,0,0,0,0,0,
+
+        0,0,1,1,0,0,
+        0,1,0,0,1,0,
+        0,1,0,0,0,0,
+        0,1,1,1,0,0,
+        0,1,0,0,1,0,
+        0,1,0,0,1,0,
+        0,0,1,1,0,0,
+        0,0,0,0,0,0,
+
+        0,1,1,1,1,0,
+        0,0,0,0,1,0,
+        0,0,0,1,0,0,
+        0,0,1,0,0,0,
+        0,0,1,0,0,0,
+        0,0,1,0,0,0,
+        0,0,1,0,0,0,
+        0,0,0,0,0,0,
+
+        0,0,1,1,0,0,
+        0,1,0,0,1,0,
+        0,1,0,0,1,0,
+        0,0,1,1,0,0,
+        0,1,0,0,1,0,
+        0,1,0,0,1,0,
+        0,0,1,1,0,0,
+        0,0,0,0,0,0,
+
+        0,0,1,1,0,0,
+        0,1,0,0,1,0,
+        0,1,0,0,1,0,
+        0,0,1,1,1,0,
+        0,0,0,0,1,0,
+        0,1,0,0,1,0,
+        0,0,1,1,0,0,
+        0,0,0,0,0,0
+        };
+
+void display_num(unsigned char *buf,int w, int h, int num, unsigned int color)
+{
+    int i;
+    int j;
+    int w1;
+    int h1;
+    w1 = w/NUM_W;
+    h1 = h/NUM_H;
+
+    for(i = 0; i < h; i++)
+    {
+        for( j = 0; j < w*4; j+=4)
+        {
+
+            buf[i*w*4+j] =   num0[num][i/h1][(j/4)/w1]*((color>>0)&0xff);//R
+            buf[i*w*4+j+1] = num0[num][i/h1][(j/4)/w1]*((color>>8)&0xff);//G
+            buf[i*w*4+j+2] = num0[num][i/h1][(j/4)/w1]*((color>>16)&0xff);//B
+            buf[i*w*4+j+3] = num0[num][i/h1][(j/4)/w1]*((color>>24)&0xff);//A
+        }
+    }
+}
 void on_surface_created() {
 
    // GLuint vertex_shader = loadShader(GL_VERTEX_SHADER, v_shader);
@@ -152,53 +334,18 @@ void on_surface_created() {
 
     int i;
     int j;
-    int tmp;
+    static int tmp;
    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
    for (i = 0; i < 6; i++)
    {
        buffer[i] = new unsigned char[_backingHeight * _backingWidth * 4];
-       memset(buffer[i],0xff, width*height*4);
+       memset(buffer[i],0x00, width*height*4);
        
    }
 
 
-    for( i = 0; i < height; i++)
-    {
-        if(i < height/3) {
 
-            for (tmp = (width * 2 - i * 4); tmp < (width * 2 + i * 4); tmp += 4) {
-                buffer[0][i * width * 4 + tmp + 1] = 0x0;
-                buffer[0][i * width * 4 + tmp + 2] = 0x0;
-            }
-        }
-        else
-        {
-            for (tmp = (width * 2 - (height/7) * 4); tmp < (width * 2 + (height/7) * 4); tmp += 4) {
-                buffer[0][i * width * 4 + tmp + 1] = 0x0;
-                buffer[0][i * width * 4 + tmp + 2] = 0x0;
-            }
-
-        }
-
-    }
-    for( i = 0; i < height; i++)
-    {
-        if(i < height/3)
-        {
-            for (tmp = (width * 2 - i * 4); tmp < (width * 2 + i * 4); tmp += 4) {
-                buffer[1][i * width * 4 + tmp + 0] = 0x0;
-                buffer[1][i * width * 4 + tmp + 2] = 0x0;
-            }
-        }
-        else
-        {
-            for (tmp = (width * 2 - (height/7) * 4); tmp < (width * 2 + (height/7) * 4); tmp += 4) {
-                buffer[1][i * width * 4 + tmp + 0] = 0x0;
-                buffer[1][i * width * 4 + tmp + 2] = 0x0;
-            }
-        }
-    }
     glGenTextures(6, cubeTex);
     for(i = 0; i < 6; i++) {
         glBindTexture(GL_TEXTURE_2D, cubeTex[i]);
@@ -213,69 +360,6 @@ void on_surface_created() {
 
 }
 
-
-GLfloat vVertices[] = { -1.0f,  1.0f, 0.0f,  // Position 0
-                        0.0f,  0.0f,        // TexCoord 0
-                        -1.0f, 1.0f/3, 0.0f,  // Position 1
-                        0.0f,  1.0f,        // TexCoord 1
-                        0.0f,  1.0f/3, 0.0f,  // Position 2
-                        1.0f,  1.0f,        // TexCoord 2
-                        0.0f,  1.0f, 0.0f,  // Position 3
-                        1.0f,  0.0f,         // TexCoord 3
-
-                        0.0f,  1.0f, 0.0f,  // Position 0
-                        0.0f,  0.0f,        // TexCoord 0
-                        0.0f,  1.0f/3, 0.0f,  // Position 1
-                        0.0f,  1.0f,        // TexCoord 1
-                        1.0f,  1.0f/3, 0.0f,  // Position 2
-                        1.0f,  1.0f,        // TexCoord 2
-                        1.0f,  1.0f, 0.0f,  // Position 3
-                        1.0f,  0.0f,         // TexCoord 3
-
-                       -1.0f, 1.0f/3, 0.0f,  // Position 0
-                        0.0f,  0.0f,        // TexCoord 0
-                        -1.0f,  -1.0f/3, 0.0f,  // Position 1
-                        0.0f,  1.0f,        // TexCoord 1
-                        0.0f,  -1.0f/3, 0.0f,  // Position 2
-                        1.0f,  1.0f,        // TexCoord 2
-                        0.0f,  1.0f/3, 0.0f,  // Position 3
-                        1.0f,  0.0f,         // TexCoord 3
-
-                        0.0f,  1.0f/3, 0.0f,  // Position 0
-                        0.0f,  0.0f,        // TexCoord 0
-                        0.0f,  -1.0f/3, 0.0f,  // Position 1
-                        0.0f,  1.0f,        // TexCoord 1
-                        1.0f,  -1.0f/3, 0.0f,  // Position 2
-                        1.0f,  1.0f,        // TexCoord 2
-                        1.0f,  1.0f/3, 0.0f,  // Position 3
-                        1.0f,  0.0f,         // TexCoord 3
-
-                        -1.0f, -1.0f/3, 0.0f,  // Position 0
-                        0.0f,  0.0f,        // TexCoord 0
-                        -1.0f,  -1.0f, 0.0f,  // Position 1
-                        0.0f,  1.0f,        // TexCoord 1
-                        0.0f,  -1.0, 0.0f,  // Position 2
-                        1.0f,  1.0f,        // TexCoord 2
-                        0.0f,  -1.0f/3, 0.0f,  // Position 3
-                        1.0f,  0.0f,         // TexCoord 3
-
-                        0.0f,  -1.0f/3, 0.0f,  // Position 0
-                        0.0f,  0.0f,        // TexCoord 0
-                        0.0f,  -1.0f, 0.0f,  // Position 1
-                        0.0f,  1.0f,        // TexCoord 1
-                        1.0f,  -1, 0.0f,  // Position 2
-                        1.0f,  1.0f,        // TexCoord 2
-                        1.0f,  -1.0f/3, 0.0f,  // Position 3
-                        1.0f,  0.0f         // TexCoord 3
-};
-
-//点的索引，因为是画三角形，所以需要分两次画成矩形，所以，0，1，2为vVertices里面的对应索引，，，分两次画三角形成为矩形
-GLushort indices[][6] = { 0, 1, 2, 0, 2, 3,
-                            4, 5, 6, 4, 6, 7,
-                            8, 9, 10, 8, 10, 11,
-                            12, 13, 14, 12, 14, 15,
-                            16, 17, 18, 16, 18, 19,
-                            20, 21, 22, 20, 22, 23 };
 
 void set_color(unsigned char *buf, unsigned int color1, unsigned int color2)
 {
@@ -326,10 +410,17 @@ void on_draw_frame() {
     //两个顶点 一个fragement
     vPosition = glGetAttribLocation(program, "a_position");
     mTextureCoordinateHandle = glGetAttribLocation(program, "a_texCoord");
-    mTextureUniformHandle = glGetUniformLocation(program, "u_Texture");
-    // mTextureUniformHandle1 = glGetUniformLocation(program, "u_Texture1");
-// Load the vertex position
+
+    //如果两个shader中都声明了同一个uniform变量，那么他们值是相同的。CPU通过变量名获取uniform变量在GPU的地址，
+    // 使用glUniform1i命令向其赋值。通常CPU通过uniform常量向GPU传递纹理等数据块。
+  //  mTextureUniformHandle = glGetUniformLocation(program, "u_Texture");
+ //   glUniform1i(mTextureUniformHandle, 0);
+
+
+    //向顶点shader赋值模型的顶点数据
+    //shader会依次对每个顶点通过一系列矩阵操作，确定其最终位置，赋值给顶点shader内建的输出变量gl_position供渲染管线下一步使用。
     glVertexAttribPointer(vPosition, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), vVertices);
+
     // Load the texture coordinate
     glVertexAttribPointer(mTextureCoordinateHandle, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat),
                           &vVertices[3]);
@@ -341,21 +432,29 @@ void on_draw_frame() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, cubeTex[0]);
     static int cnt = 1;
+    static int tmp = 0;
     int i = 0;
-    for (i = 0; i < 6; i++) {
-         //   set_color(buffer[i], 0xffff0000, 0xffff00ff);
-        // printf("%x %x\n", (cnt%6)<<(cnt%6*4), cnt%6);
-
-        if(cnt%2 == 0) {
-            set_color(buffer[i], 0xffffffff & ((0xff) << ((i%4) * 8)),
-                      0xffffffff >> ((i%4) * 8));
-        } else {
-
-                set_color(buffer[i], 0xffffffff >> ((cnt%4 ) * 8),
-                          0xffffffff & ((0xff) << ((cnt%4) * 8)));
+    unsigned int num_color = 0xffffffff;
+    if(tmp % 21 == 0)
+    {
+        if(tmp%42 == 0)
+        {
+           num_color = num_color&((0xff<<(tmp%24)));
         }
+        for (i = 0; i < 6; i++) {
+            display_num(buffer[i], width, height, cnt+i>9?cnt+i-10:cnt+i, num_color);
+           // display_num(buffer[i], width, height, (cnt + i) < 10 ? (cnt + i) : (cnt + i - 10),
+                        //num_color);
+
+       }
     }
+
     cnt++;
+    tmp++;
+    if(cnt >= 10)
+    {
+        cnt = 0;
+    }
 
 
     for(i = 0; i < 6; i++)
