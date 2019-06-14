@@ -88,7 +88,132 @@ GLushort indices[][6] = { 0, 1, 2, 0, 2, 3,
 
 
 
-int _backingWidth = 420;
+#define NUM_W 8
+#define NUM_H 8
+
+unsigned char num0[11][NUM_H][NUM_W]= {
+        0,0,0,1,1,0,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,0,1,1,0,0,0,
+        0,0,0,0,0,0,0,0,
+
+        0,0,0,0,1,0,0,0,
+        0,0,0,1,1,0,0,0,
+        0,0,0,0,1,0,0,0,
+        0,0,0,0,1,0,0,0,
+        0,0,0,0,1,0,0,0,
+        0,0,0,0,1,0,0,0,
+        0,0,0,1,1,1,0,0,
+        0,0,0,0,0,0,0,0,
+
+        0,0,0,1,1,0,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,0,0,0,1,0,0,
+        0,0,0,1,1,0,0,0,
+        0,0,1,0,0,0,0,0,
+        0,0,1,0,0,0,0,0,
+        0,0,1,1,1,1,0,0,
+        0,0,0,0,0,0,0,0,
+
+
+        0,0,0,1,1,0,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,0,0,0,1,0,0,
+        0,0,0,1,1,0,0,0,
+        0,0,0,0,0,1,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,0,1,1,0,0,0,
+        0,0,0,0,0,0,0,0,
+
+        0,0,0,0,0,0,0,0,
+        0,0,1,0,0,0,0,0,
+        0,0,1,0,1,0,0,0,
+        0,0,1,0,1,0,0,0,
+        0,0,1,1,1,1,0,0,
+        0,0,0,0,1,0,0,0,
+        0,0,0,0,1,0,0,0,
+        0,0,0,0,0,0,0,0,
+
+        0,0,0,1,1,1,0,0,
+        0,0,1,0,0,0,0,0,
+        0,0,1,0,0,0,0,0,
+        0,0,0,1,1,0,0,0,
+        0,0,0,0,0,1,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,0,1,1,0,0,0,
+        0,0,0,0,0,0,0,0,
+
+        0,0,0,1,1,0,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,1,0,0,0,0,0,
+        0,0,1,1,1,0,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,0,1,1,0,0,0,
+        0,0,0,0,0,0,0,0,
+
+        0,0,1,1,1,1,0,0,
+        0,0,0,0,0,1,0,0,
+        0,0,0,0,1,0,0,0,
+        0,0,0,1,0,0,0,0,
+        0,0,0,1,0,0,0,0,
+        0,0,0,1,0,0,0,0,
+        0,0,0,1,0,0,0,0,
+        0,0,0,0,0,0,0,0,
+
+        0,0,0,1,1,0,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,0,1,1,0,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,0,1,1,0,0,0,
+        0,0,0,0,0,0,0,0,
+
+        0,0,0,1,1,0,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,0,1,1,1,0,0,
+        0,0,0,0,0,1,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,0,1,1,0,0,0,
+        0,0,0,0,0,0,0,0,
+
+        0,0,1,1,1,1,0,0,
+        0,0,1,0,0,0,0,0,
+        0,0,1,0,0,0,0,0,
+        0,0,1,1,1,1,0,0,
+        0,0,1,0,0,0,0,0,
+        0,0,1,0,0,0,0,0,
+        0,0,1,1,1,1,0,0,
+        0,0,0,0,0,0,0,0
+/*
+        0,0,0,1,1,1,0,0,
+        0,0,1,0,0,0,1,0,
+        0,0,0,0,0,0,1,0,
+        0,0,0,1,1,1,1,0,
+        0,0,1,0,0,0,1,0,
+        0,0,1,0,0,0,1,0,
+        0,0,0,1,1,1,0,1,
+        0,0,0,0,0,0,0,0,
+
+        0,0,1,0,0,0,0,0,
+        0,0,1,0,0,0,0,0,
+        0,0,1,0,0,0,0,0,
+        0,0,1,1,1,0,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,1,0,0,1,0,0,
+        0,0,0,1,1,0,0,0,
+        0,0,0,0,0,0,0,0  */
+
+};
+
+
+int _backingWidth = 400;
 int _backingHeight = 320;
 int width=_backingWidth;
 int height=_backingHeight;
@@ -145,23 +270,7 @@ const GLchar p_shader1[1024] =
 /*gl_Position，内建变量，顶点着色器的输出值，而且是必须要赋值的变量。对 gl_Position 设置的值会成为该顶点着色器的输出。
 gl_FragColor，和 gl_Position 一样，也是内建变量，对应片段的色值。*/
 
-const GLchar v_shader1[1024] =
-        "attribute vec4 position; \n"
-        "uniform mat4 modelViewProjMatrix; \n"
-        "void main() { \n"
-        "gl_Position = modelViewProjMatrix * position; \n"
-        "}  \n";
 
-
-const GLchar p_shader[1024] =
-        "precision mediump float;					  \n"
-        "uniform sampler2D u_Texture;                 \n"
-        "varying vec4 v_Color;                        \n"
-        "varying vec2 v_TexCoordinate;                \n”"
-        "void main()                                  \n"
-        "{                                            \n"
-        "  gl_FragColor = texture2D(u_Texture, v_TexCoordinate); \n"
-        "}                                            \n";
 GLuint createProgram(const char* vertexSource, const char * fragmentSource)
 {
     GLuint vertexShader = loadShader(GL_VERTEX_SHADER, vertexSource);
@@ -203,103 +312,7 @@ GLuint createProgram(const char* vertexSource, const char * fragmentSource)
     return program;
 }
 
-#define NUM_W 6
-#define NUM_H 8
-
-unsigned char num0[10][NUM_H][NUM_W]= {
-        0,0,1,1,0,0,
-        0,1,0,0,1,0,
-        0,1,0,0,1,0,
-        0,1,0,0,1,0,
-        0,1,0,0,1,0,
-        0,1,0,0,1,0,
-        0,0,1,1,0,0,
-        0,0,0,0,0,0,
-
-        0,0,0,1,0,0,
-        0,0,1,1,0,0,
-        0,0,0,1,0,0,
-        0,0,0,1,0,0,
-        0,0,0,1,0,0,
-        0,0,0,1,0,0,
-        0,0,1,1,1,0,
-        0,0,0,0,0,0,
-
-        0,0,1,1,0,0,
-        0,1,0,0,1,0,
-        0,0,0,0,1,0,
-        0,0,1,1,0,0,
-        0,1,0,0,0,0,
-        0,1,0,0,0,0,
-        0,1,1,1,1,0,
-        0,0,0,0,0,0,
-
-
-        0,0,1,1,0,0,
-        0,1,0,0,1,0,
-        0,0,0,0,1,0,
-        0,0,1,1,0,0,
-        0,0,0,0,1,0,
-        0,1,0,0,1,0,
-        0,0,1,1,0,0,
-        0,0,0,0,0,0,
-
-        0,0,0,0,0,0,
-        0,1,0,0,0,0,
-        0,1,0,1,0,0,
-        0,1,0,1,0,0,
-        0,1,1,1,1,0,
-        0,0,0,1,0,0,
-        0,0,0,1,0,0,
-        0,0,0,0,0,0,
-
-        0,0,1,1,1,0,
-        0,1,0,0,0,0,
-        0,1,0,0,0,0,
-        0,0,1,1,0,0,
-        0,0,0,0,1,0,
-        0,1,0,0,1,0,
-        0,0,1,1,0,0,
-        0,0,0,0,0,0,
-
-        0,0,1,1,0,0,
-        0,1,0,0,1,0,
-        0,1,0,0,0,0,
-        0,1,1,1,0,0,
-        0,1,0,0,1,0,
-        0,1,0,0,1,0,
-        0,0,1,1,0,0,
-        0,0,0,0,0,0,
-
-        0,1,1,1,1,0,
-        0,0,0,0,1,0,
-        0,0,0,1,0,0,
-        0,0,1,0,0,0,
-        0,0,1,0,0,0,
-        0,0,1,0,0,0,
-        0,0,1,0,0,0,
-        0,0,0,0,0,0,
-
-        0,0,1,1,0,0,
-        0,1,0,0,1,0,
-        0,1,0,0,1,0,
-        0,0,1,1,0,0,
-        0,1,0,0,1,0,
-        0,1,0,0,1,0,
-        0,0,1,1,0,0,
-        0,0,0,0,0,0,
-
-        0,0,1,1,0,0,
-        0,1,0,0,1,0,
-        0,1,0,0,1,0,
-        0,0,1,1,1,0,
-        0,0,0,0,1,0,
-        0,1,0,0,1,0,
-        0,0,1,1,0,0,
-        0,0,0,0,0,0
-        };
-
-void display_num(unsigned char *buf,int w, int h, int num, unsigned int color)
+void display_num(unsigned char *buf,int w, int h, unsigned char num, unsigned int color)
 {
     int i;
     int j;
@@ -313,10 +326,23 @@ void display_num(unsigned char *buf,int w, int h, int num, unsigned int color)
         for( j = 0; j < w*4; j+=4)
         {
 
-            buf[i*w*4+j] =   num0[num][i/h1][(j/4)/w1]*((color>>0)&0xff);//R
-            buf[i*w*4+j+1] = num0[num][i/h1][(j/4)/w1]*((color>>8)&0xff);//G
-            buf[i*w*4+j+2] = num0[num][i/h1][(j/4)/w1]*((color>>16)&0xff);//B
-            buf[i*w*4+j+3] = num0[num][i/h1][(j/4)/w1]*((color>>24)&0xff);//A
+            if(num < 10) {
+                buf[i * w * 4 + j] = num0[num][i / h1][(j / 4) / w1] * ((color >> 0) & 0xff);//R
+                buf[i * w * 4 + j + 1] = num0[num][i / h1][(j / 4) / w1] * ((color >> 8) & 0xff);//G
+                buf[i * w * 4 + j + 2] =
+                        num0[num][i / h1][(j / 4) / w1] * ((color >> 16) & 0xff);//B
+                buf[i * w * 4 + j + 3] =
+                        num0[num][i / h1][(j / 4) / w1] * ((color >> 24) & 0xff);//A
+            }
+            else
+            {
+                buf[i * w * 4 + j] = num0[10][i / h1][(j / 4) / w1] * ((color >> 0) & 0xff);//R
+                buf[i * w * 4 + j + 1] = num0[10][i / h1][(j / 4) / w1] * ((color >> 8) & 0xff);//G
+                buf[i * w * 4 + j + 2] =
+                        num0[10][i / h1][(j / 4) / w1] * ((color >> 16) & 0xff);//B
+                buf[i * w * 4 + j + 3] =
+                        num0[10][i / h1][(j / 4) / w1] * ((color >> 24) & 0xff);//A
+            }
         }
     }
 }
@@ -343,8 +369,6 @@ void on_surface_created() {
        memset(buffer[i],0x00, width*height*4);
        
    }
-
-
 
     glGenTextures(6, cubeTex);
     for(i = 0; i < 6; i++) {
@@ -396,7 +420,7 @@ void set_color(unsigned char *buf, unsigned int color1, unsigned int color2)
 
 void on_draw_frame() {
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glUseProgram(program);
 
@@ -431,20 +455,19 @@ void on_draw_frame() {
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, cubeTex[0]);
-    static int cnt = 1;
+    static unsigned char  cnt = 1;
     static int tmp = 0;
-    int i = 0;
+    unsigned char i = 0;
     unsigned int num_color = 0xffffffff;
-    if(tmp % 21 == 0)
+    if(tmp % 41 == 0)
     {
-        if(tmp%42 == 0)
+     //   if(tmp%82 == 0)
         {
-           num_color = num_color&((0xff<<(tmp%24)));
+           num_color = num_color&((0xff<<(tmp%25)));
         }
         for (i = 0; i < 6; i++) {
             display_num(buffer[i], width, height, cnt+i>9?cnt+i-10:cnt+i, num_color);
-           // display_num(buffer[i], width, height, (cnt + i) < 10 ? (cnt + i) : (cnt + i - 10),
-                        //num_color);
+            //display_num(buffer[i], width, height, 10,num_color);
 
        }
     }
@@ -474,7 +497,7 @@ void on_surface_changed(int width, int height) {
     int h;
     w = width;
     h = height;
-
+    //surface大小变化时，视口变换
     glViewport(0, 0, w, h);
 }
 
