@@ -327,14 +327,14 @@ void readyuv420(int num, unsigned char *bufout, int w, int h)
     for(i = 0; i < w*h; i+=1)
     {
         //get u/v index while loop in Y plain
-        if((i/w)%2 == 0)
-        {
-            cnt = (w/2)*((i/w)/2)+(i%w)/2;
-        }
-        else
-        {
-            cnt = (w/2)*(((i/w)/2)-1)+(i%w)/2;
-        }
+     //   if((i/w)%2 == 0)
+    //    {
+    //        cnt = (w/2)*((i/w)/2)+(i%w)/2;
+    //    }
+    //    else
+     //   {
+            cnt = (w/2)*(((i/w)/2))+(i%w)/2;
+    //    }
 
         int R =  (int)((298*addr[i]+408*(addr[voff+cnt]-128)+128)>>8);
         int G =  (int)((298*addr[i]-100*(addr[uoff+cnt]-128)-208*(addr[voff+cnt]-128)+128)>>8);
