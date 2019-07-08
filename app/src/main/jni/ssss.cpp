@@ -7,11 +7,14 @@
 #include<stdlib.h>
 #include <string.h>
 #include <EGL/egl.h>
+#include <fcntl.h>
+#include <GLES2/gl2.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#include<unistd.h>
 static GLuint loadShader (GLenum shader_type, const char *const source);
+void readyuv420(int num, unsigned char *bufout, int w, int h);
 
 
 GLuint program;
@@ -20,7 +23,7 @@ GLint vPosition;
 GLuint cubeTex[6] ;
 
 float mVerticesData[] =  { 0.5f, 0.5f, 0.0f,
-                          -0.5f, 0.5f, 0.0f,
+                           -0.5f, 0.5f, 0.0f,
                            0.0f, -0.5f, 0.0f};
 
 GLfloat vVertices[] = { -1.0f,  1.0f, 0.0f,  // Position 0
@@ -200,7 +203,6 @@ unsigned char num0[11][NUM_H][NUM_W]= {
         0,0,1,0,0,0,1,0,
         0,0,0,1,1,1,0,1,
         0,0,0,0,0,0,0,0,
-
         0,0,1,0,0,0,0,0,
         0,0,1,0,0,0,0,0,
         0,0,1,0,0,0,0,0,
@@ -213,8 +215,8 @@ unsigned char num0[11][NUM_H][NUM_W]= {
 };
 
 
-int _backingWidth = 400;
-int _backingHeight = 320;
+int _backingWidth = 320;
+int _backingHeight = 240;
 int width=_backingWidth;
 int height=_backingHeight;
 GLuint loadShader(GLenum shaderType, const char* shaderSource)
@@ -269,7 +271,95 @@ const GLchar p_shader1[1024] =
         "}                                            \n";
 /*gl_Position，内建变量，顶点着色器的输出值，而且是必须要赋值的变量。对 gl_Position 设置的值会成为该顶点着色器的输出。
 gl_FragColor，和 gl_Position 一样，也是内建变量，对应片段的色值。*/
+#define W 320
+#define H 240
 
+unsigned char vbuf[W*H];
+unsigned char ubuf[W*H];
+
+//unsigned char *addr = NULL;
+int uoff = W*H;
+int voff = W*H+(W*H/4);
+//char *yuvfile[6]={"1.yuv", "2.yuv", "3.yuv", "4.yuv", "5.yuv", "6.yuv"};
+char *yuvfile[6]={"/sdcard/1.yuv","/sdcard/2.yuv","/sdcard/3.yuv","/sdcard/4.yuv","/sdcard/5.yuv","/sdcard/6.yuv"};
+int framecnt[6]={0,0,0,0,0,0};
+unsigned char addr[W*H*6/4];
+//yuv420 to RGB
+void readyuv420(int num, unsigned char *bufout, int w, int h)
+{
+
+    //   unsigned char *bmp = NULL;
+    //   addr = (unsigned char*)malloc(w*h*6/4);
+    //  memset(addr, 0x0, w*h*6/4);
+    //  memset(vbuf, 0x0, w*h);
+    //  memset(ubuf, 0x0, w*h);
+
+//YYYY YYYY YYYY YYYY YYYY YYYY ...UUUU.... VVVV ...
+    int i = 0;
+    FILE* fp;
+    fp = fopen(yuvfile[num],"r+");
+    if(fp == NULL)
+    {
+        //   exit(0);
+    }
+
+    int off;
+    long total = 0;
+    fseek(fp, 0, SEEK_END);
+    total = ftell(fp);
+    off = framecnt[num]*W*H*6/4;
+
+    if(off > total)
+    {
+        off=0;
+        framecnt[num]=0;
+    }
+    fseek(fp, off, SEEK_SET);
+
+    size_t ret;
+    ret = fread(addr, 1, size_t(w*h*6/4), fp);
+    fclose(fp);
+    framecnt[num]+=1;
+    printf("REt %ld\n", ret);
+
+    int cnt = 0;
+
+    for(i = 0; i < w*h; i+=1)
+    {
+        //get u/v index while loop in Y plain
+        if((i/w)%2 == 0)
+        {
+            cnt = (w/2)*((i/w)/2)+(i%w)/2;
+        }
+        else
+        {
+            cnt = (w/2)*(((i/w)/2)-1)+(i%w)/2;
+        }
+
+        int R =  (int)((298*addr[i]+408*(addr[voff+cnt]-128)+128)>>8);
+        int G =  (int)((298*addr[i]-100*(addr[uoff+cnt]-128)-208*(addr[voff+cnt]-128)+128)>>8);
+        int B =  (int)((298*addr[i]+516*(addr[uoff+cnt]-128)+128)>>8);
+
+
+        if (R < 0){ R = 0; }
+        if (G < 0){ G = 0; }
+        if (B < 0){ B = 0; }
+        if (R > 255) { R = 255; }
+        if (G > 255) { G = 255; }
+        if (B > 255) { B = 255; }
+
+        bufout[i*4+0] = (unsigned char ) (R);//0xff;//addr[i];
+        bufout[i*4+1] = (unsigned char ) (G);//vbuf[i];
+        bufout[i*4+2] = (unsigned char ) (B);//ubuf[i];
+        // bufout[i*4+3] = 0xff;
+
+
+    }
+
+    //   free(addr);
+    //  return bmp;
+
+}
 
 GLuint createProgram(const char* vertexSource, const char * fragmentSource)
 {
@@ -301,7 +391,6 @@ GLuint createProgram(const char* vertexSource, const char * fragmentSource)
                 if (buf)
                 {
                     glGetProgramInfoLog(program, bufLength, NULL, buf);
-
                     free(buf);
                 }
             }
@@ -348,8 +437,8 @@ void display_num(unsigned char *buf,int w, int h, unsigned char num, unsigned in
 }
 void on_surface_created() {
 
-   // GLuint vertex_shader = loadShader(GL_VERTEX_SHADER, v_shader);
-   // GLuint fragment_shader = loadShader(GL_FRAGMENT_SHADER, p_shader);
+    // GLuint vertex_shader = loadShader(GL_VERTEX_SHADER, v_shader);
+    // GLuint fragment_shader = loadShader(GL_FRAGMENT_SHADER, p_shader);
     ///  glAttachShader(program, vertex_shader);
     //  glAttachShader(program, fragment_shader);
 
@@ -361,14 +450,14 @@ void on_surface_created() {
     int i;
     int j;
     static int tmp;
-   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-   for (i = 0; i < 6; i++)
-   {
-       buffer[i] = new unsigned char[_backingHeight * _backingWidth * 4];
-       memset(buffer[i],0x00, width*height*4);
-       
-   }
+    for (i = 0; i < 6; i++)
+    {
+        buffer[i] = new unsigned char[_backingHeight * _backingWidth * 4];
+        memset(buffer[i],0x00, width*height*4);
+
+    }
 
     glGenTextures(6, cubeTex);
     for(i = 0; i < 6; i++) {
@@ -437,8 +526,8 @@ void on_draw_frame() {
 
     //如果两个shader中都声明了同一个uniform变量，那么他们值是相同的。CPU通过变量名获取uniform变量在GPU的地址，
     // 使用glUniform1i命令向其赋值。通常CPU通过uniform常量向GPU传递纹理等数据块。
-  //  mTextureUniformHandle = glGetUniformLocation(program, "u_Texture");
- //   glUniform1i(mTextureUniformHandle, 0);
+    //  mTextureUniformHandle = glGetUniformLocation(program, "u_Texture");
+    //   glUniform1i(mTextureUniformHandle, 0);
 
 
     //向顶点shader赋值模型的顶点数据
@@ -459,17 +548,17 @@ void on_draw_frame() {
     static int tmp = 0;
     unsigned char i = 0;
     unsigned int num_color = 0xffffffff;
-    if(tmp % 41 == 0)
+    // if(tmp % 41 == 0)
     {
-     //   if(tmp%82 == 0)
+        //   if(tmp%82 == 0)
         {
-           num_color = num_color&((0xff<<(tmp%25)));
+            num_color = num_color&((0xff<<(tmp%25)));
         }
         for (i = 0; i < 6; i++) {
-            display_num(buffer[i], width, height, cnt+i>9?cnt+i-10:cnt+i, num_color);
+            //  display_num(buffer[i], width, height, cnt+i>9?cnt+i-10:cnt+i, num_color);
             //display_num(buffer[i], width, height, 10,num_color);
-
-       }
+            readyuv420(i, buffer[i], W, H);
+        }
     }
 
     cnt++;
@@ -482,11 +571,13 @@ void on_draw_frame() {
 
     for(i = 0; i < 6; i++)
     {
+
         glActiveTexture ( GL_TEXTURE0 ); //TODO GL_TEXTURE0??
         glBindTexture(GL_TEXTURE_2D, cubeTex[i]);
         //glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,buffer[1]);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer[i]);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices[i]);
+
     }
 
 
